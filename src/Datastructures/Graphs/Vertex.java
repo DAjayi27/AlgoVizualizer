@@ -77,7 +77,12 @@ public class Vertex <T extends Comparable<T>> {
             return 0;
         }
 
-        return this.vertixAdjadencyWeights.get(vertex);
+
+        if ( this.vertixAdjadencyWeights.get(vertex) == null){
+            return 0;
+        }
+
+        return this.vertixAdjadencyWeights.get(vertex) ;
 
     }
     public void removeAdjacency(Vertex<T> vertex){

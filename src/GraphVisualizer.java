@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.QuadCurve2D;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 import javax.swing.BorderFactory;
@@ -54,7 +53,9 @@ public class GraphVisualizer extends JPanel {
                 Point startingPosition = vertexPositions.get(vertex);
                 Point endPosition = vertexPositions.get(adj);
 
-                drawCurve(graphics,startingPosition,endPosition,adjustedVertexSize);
+                int associatedWeight =  vertex.getWeight(adj);
+
+                drawCurve(graphics,startingPosition,endPosition,adjustedVertexSize,associatedWeight);
 
             }
         }
@@ -66,22 +67,32 @@ public class GraphVisualizer extends JPanel {
      * @param startingPosition the starting position of the curve
      * @param endPosition the end position of the curve.
      * **/
-    private void drawCurve(Graphics2D g,Point startingPosition, Point endPosition,int adjustedVertexSize){
+    private void drawCurve(Graphics2D g,Point startingPosition, Point endPosition,int adjustedVertexSize,int weight){
         double controlPointX = (startingPosition.x + endPosition.x)/2.0;
         double controlPointY = ((startingPosition.y + endPosition.y)/2.0) -30;
 
-        int startX = startingPosition.x + (adjustedVertexSize/2);
-        int startY = startingPosition.y + (adjustedVertexSize/2);
+        int startX = startingPosition.x ;
+        int startY = startingPosition.y;
 
-        int endX = endPosition.x + (adjustedVertexSize/2);
-        int endY = endPosition.y + (adjustedVertexSize/2);
+        int endX = endPosition.x;
+        int endY = endPosition.y;
+
+        generateOptimalStartingAndEndPoints(startX,startY,endX,endY);
+
+
 
         QuadCurve2D curve = new QuadCurve2D.Double(startX,startY,controlPointX,controlPointY,endX,endY);
         g.setColor(Color.BLACK);
         g.setStroke(new BasicStroke(2));
         g.draw(curve);
+        drawWeight(g,startX,startY,endX,endY,weight);
+        drawDirection(g,startX,startY,adjustedVertexSize);
 
     }
+
+    private void generateOptimalStartingAndEndPoints(int startX, int startY, int endX, int endY) {
+    }
+
 
     /**
      * Called to populate the panel with the vertices in a graph
@@ -130,4 +141,41 @@ public class GraphVisualizer extends JPanel {
 
         }
     }
+
+    /***
+     * Draws the weights between 2 vertexes onto the graph object
+     * The weighst are drawn at the mid point of the curve connection 2 verticies
+     * @param graphics the graphics object being drawn to
+     * @param startX the starting x position of the curve drawn
+     * @param startY the starting y position of the curve drawn
+     * @param endX the ending x position of the curve drawn
+     * @param endY the ending y position of the curve drawn
+     * @param weight the weight value being drawn.
+     */
+    public void drawWeight(Graphics2D graphics, int startX, int startY, int endX, int endY,int weight){
+
+        int weightXPosition  = (startX + endX) /2;
+        int weightYPosition =  (startY + endY) / 2;
+        graphics.drawString(Integer.toString(weight),weightXPosition,weightYPosition);
+
+    }
+
+    /**
+     * Draws an arrow representing the direction of the connection between 2 verticies in a grapg
+     * @param g the graphics object being drawn to
+     * @param startX the stating x position where the arrow is being drawn.
+     * @param startY the stating y position where the arrow is being drawn.
+     * @param vertexSize used to offset the starting position to draw the arrow from
+     * **/
+    private void drawDirection(Graphics2D g, int startX, int startY,int vertexSize) {
+
+
+
+        g.drawLine(startX,startY,startX-10, startY + 10);
+
+        g.drawLine(startX,startY,startX+10, startY + 10);
+
+
+    }
+
 }

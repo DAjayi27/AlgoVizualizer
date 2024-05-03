@@ -21,7 +21,9 @@ public class VizTests {
         testEnv.setVisible(true);
         testEnv.setVisible(true);
 
-        for (int i = 0; i < 20; i++) {
+        int noOfVertcies  = 10;
+
+        for (int i = 0; i < noOfVertcies; i++) {
 
             int ascii = 97 + i;
             char letter = (char) ascii;
@@ -33,15 +35,15 @@ public class VizTests {
 
         Random random =  new Random();
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < noOfVertcies    ; i++) {
 
-           int vertexAAscii = random.nextInt(19) + 97;
-           int vertexBAscii = random.nextInt(19) + 97;
+           int vertexAAscii = random.nextInt(noOfVertcies) + 97;
+           int vertexBAscii = random.nextInt(noOfVertcies) + 97;
 
            String vertexA = Character.toString((char) vertexAAscii);
            String vertexB = Character.toString((char) vertexBAscii);
 
-           testGraph.addEdge(vertexA,vertexB);
+           testGraph.addEdge(vertexA,vertexB,10);
             testViz.repaint();
             Thread.sleep(200);
         }
