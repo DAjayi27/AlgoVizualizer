@@ -35,7 +35,7 @@ public class VizTests {
 
         Random random =  new Random();
 
-        for (int i = 0; i < noOfVertcies    ; i++) {
+        for (int i = 0; i < 10; i++) {
 
            int vertexAAscii = random.nextInt(noOfVertcies) + 97;
            int vertexBAscii = random.nextInt(noOfVertcies) + 97;

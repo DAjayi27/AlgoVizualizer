@@ -50,8 +50,8 @@ public class GraphVisualizer extends JPanel {
             List<Vertex> nestedAdjacency = vertex.getAdjacencies();
             for (Vertex adj: nestedAdjacency){
 
-                Point startingPosition = vertexPositions.get(vertex);
-                Point endPosition = vertexPositions.get(adj);
+                Point startingPosition = new Point(vertexPositions.get(vertex));
+                Point endPosition = new Point(vertexPositions.get(adj));
 
                 int associatedWeight =  vertex.getWeight(adj);
 
@@ -69,7 +69,9 @@ public class GraphVisualizer extends JPanel {
      * **/
     private void drawCurve(Graphics2D g,Point startingPosition, Point endPosition,int adjustedVertexSize,int weight){
         double controlPointX = (startingPosition.x + endPosition.x)/2.0;
-        double controlPointY = ((startingPosition.y + endPosition.y)/2.0) -30;
+        double controlPointY = ((startingPosition.y + endPosition.y)/2.0) -50;
+
+        generateOptimalStartingAndEndPoints(startingPosition,endPosition,adjustedVertexSize);
 
         int startX = startingPosition.x ;
         int startY = startingPosition.y;
@@ -77,27 +79,66 @@ public class GraphVisualizer extends JPanel {
         int endX = endPosition.x;
         int endY = endPosition.y;
 
-        generateOptimalStartingAndEndPoints(startX,startY,endX,endY);
-
-
 
         QuadCurve2D curve = new QuadCurve2D.Double(startX,startY,controlPointX,controlPointY,endX,endY);
         g.setColor(Color.BLACK);
         g.setStroke(new BasicStroke(2));
         g.draw(curve);
-        drawWeight(g,startX,startY,endX,endY,weight);
-        drawDirection(g,startX,startY,adjustedVertexSize);
+        drawWeight( g,startX,startY,endX,endY,weight );
+//        drawDirection(g,startX,startY);
 
     }
 
-    private void generateOptimalStartingAndEndPoints(int startX, int startY, int endX, int endY) {
+
+    /***
+     * This method will generate more optimal starting line positions, to prevent lines from being in bad positions or cutting through vertex points.
+     * It looks at the position of the endpoint and picks a more suitable connection between them.
+     * @param start the starting position
+     * @param end the ending position
+     * @param vertexSize for offsetting the positions of the verticies.
+     * */
+    private void generateOptimalStartingAndEndPoints(Point start , Point end ,int vertexSize) {
+
+
+        int offset = vertexSize/2;
+
+        // check if the end point is below our starting point (remember the y-axis is inverted in java swing)
+        if (  end.y  > start.y ){
+
+            end.y = end.y - offset;
+
+            if (end.x < start.x ){
+                start.x = start.x - offset;
+            }
+            else{
+                start.x = start.x + offset;
+            }
+
+        }
+
+
+        if (end.y < start.y){
+
+            start.y = start.y - offset;
+
+            if (start.x < end.x ){
+                end.x = end.x - offset;
+            }
+            else{
+                end.x = end.x + offset;
+            }
+
+
+
+        }
+
     }
 
 
     /**
      * Called to populate the panel with the vertices in a graph
      * Draws a circle on the j panel for each vertex in the graph.
-     * Meaning if there are 5 vertices in the graph, 5 circles are drawn.
+     * Meaning if there are five vertices in the graph, five circles are drawn.
      * @param g the graphics object drawn to
      * @param horizontalBound the horizontal bound of the j panel
      * @param verticalBound the vertical bound of the j panel
@@ -118,10 +159,11 @@ public class GraphVisualizer extends JPanel {
             int adjustedTextYPosition;
 
             boolean vertexHasNoPosition = vertexPositions.get(vertex) == null;
+            int radius = adjustedVertexSize/2;
             if (vertexHasNoPosition){
 
-                 xPosition =  rand.nextInt(horizontalBound-adjustedVertexSize)  ;
-                 yPosition = rand.nextInt(verticalBound-adjustedVertexSize) ;
+                 xPosition =  rand.nextInt(horizontalBound-adjustedVertexSize) ;
+                 yPosition = rand.nextInt(verticalBound-adjustedVertexSize)  ;
                  vertexPositions.put(vertex,new Point(xPosition,yPosition));
             }
             else{
@@ -130,13 +172,13 @@ public class GraphVisualizer extends JPanel {
                 yPosition = (int)position.getY();
             }
 
-            adjustedTextXPosition =  xPosition + (adjustedVertexSize / 2);
-            adjustedTextYPosition = yPosition + (adjustedVertexSize / 2);
+            adjustedTextXPosition =  xPosition ;
+            adjustedTextYPosition = yPosition ;
 
 
 
 
-            g.drawOval(xPosition,yPosition, adjustedVertexSize, adjustedVertexSize);
+            g.drawOval(xPosition - radius ,yPosition - radius, adjustedVertexSize, adjustedVertexSize);
             g.drawString(vertex.getData().toString(),adjustedTextXPosition,adjustedTextYPosition);
 
         }
@@ -167,13 +209,13 @@ public class GraphVisualizer extends JPanel {
      * @param startY the stating y position where the arrow is being drawn.
      * @param vertexSize used to offset the starting position to draw the arrow from
      * **/
-    private void drawDirection(Graphics2D g, int startX, int startY,int vertexSize) {
+    private void drawDirection(Graphics2D g, int startX, int startY) {
 
 
 
-        g.drawLine(startX,startY,startX-10, startY + 10);
+        g.drawLine(startX,startY,startX - 10, startY - 10);
 
-        g.drawLine(startX,startY,startX+10, startY + 10);
+        g.drawLine(startX,startY,startX + 10, startY - 10);
 
 
     }
